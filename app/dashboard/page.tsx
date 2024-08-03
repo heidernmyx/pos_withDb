@@ -41,8 +41,11 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { ProductList, ProductCart } from "@/lib/utils";
 import { exit } from "process";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  
+  const router = useRouter();
 
   const [session, setSession] = useState('');
   const [inputProduct, setProductInput] = useState('');
@@ -50,7 +53,10 @@ export default function Dashboard() {
   const [ displayQuantity, setDisplayQuantity ] = useState(0);
   const [ subTotal, setSubTotal] = useState(0);
   const [ total, setTotal] = useState(0);
-
+  const [ quantityTotal, setQuantityTOtal ] = useState(0);
+  const [ mop, setMop ] = useState('');
+  const [ cash, setCash ] = useState(0);
+  const [ time, setTime ] = useState('');
 
   const [productList, setProductList] = useState<ProductList[]>([]);
   const [productCart, setProductCart] = useState<ProductCart[]>([]);
@@ -64,6 +70,11 @@ export default function Dashboard() {
   const quantityRef = useRef<HTMLInputElement>(null);
   const mopRef = useRef<HTMLSelectElement>(null);
   const calculateRef = useRef<HTMLButtonElement>(null);
+  const cashRef = useRef<HTMLInputElement>(null);
+
+  const formattedDateTime = new Date().toLocaleString();
+
+
 
 
   useEffect(() => {
@@ -73,12 +84,16 @@ export default function Dashboard() {
   useEffect(() => {
     itemRef.current?.focus();
     setQuantity(1);
+    setTime(formattedDateTime);
+
   }, [])
 
   useEffect(() => {
     setSubTotal(getTotal)
     setQuantity(1);
-  }, [productCart])
+    setTotal(subTotal* (12/100) + subTotal)
+    setQuantityTOtal(getTotalQuantity);
+  }, [productCart, subTotal])
 
   useEffect(() => {
     setSession(sessionStorage.fullname);
@@ -113,6 +128,8 @@ export default function Dashboard() {
         }, 1000);
       } else if (event.key === 'Escape') {
         // handle escape
+        sessionStorage.clear();
+        router.push('/');
       } else if (event.key === 'Delete') {
         // handle delete
       } else if (event.key === 't' || event.key === 'T') {
@@ -150,9 +167,23 @@ export default function Dashboard() {
           return;
         }
       } 
-      else if (event.key === "c") {
+      else if (event.key === "q") {
+        if (!mop) {
+          alert("Select Payment Method!")
+          return;
+        }
+        if (mop == "Cash" && cash < total) {
+          alert("Insufficient Cash")
+          return;
+        }
+        if (productCart.length === 0) {
+          alert("Add items first!")
+          return;
+        }
+        setTime(new Date().toLocaleTimeString());
         calculateRef.current?.click();
       }
+      
       else if (event.key === "m"
         
       ) {
@@ -169,6 +200,15 @@ export default function Dashboard() {
         }
       }
     };
+    if ( mop != "Cash" ) {
+      cashRef.current?.click();
+    }
+    
+    if (!sessionStorage.getItem('fullname')) { // Adjust the key to your specific session key
+      // clearSessionAndRedirect();
+      router.push('/')
+    }
+    
 
     document.addEventListener('keydown', handleKeyDown);
 
@@ -178,25 +218,25 @@ export default function Dashboard() {
     };
   }, [productList, inputProduct]);
 
-  // Logging inputProduct changes
   useEffect(() => {
     console.log('Input Product:', inputProduct);
   }, [inputProduct]);
+
   const getTotal = () => {
-    // console.log(product.amount)
     return productCart.reduce((acc, product) => acc + product.amount, 0);
     // var total = 0; 
     // productCart.forEach(product => {
     //   total += product.price
     // })
-    return total;
   }
-
+  const getTotalQuantity = () => {
+    return productCart.reduce((acc, product) => acc + product.quantity, 0);
+  }
 
   return (
     <>
-      <div>
-        <Container className="h-[90vh] p-[2vh] border border-black mx-[5vw] my-[5vh]">
+      <div className="">
+        <Container className="h-[90vh] p-[2vh] bg-gray-300 border border-black mx-[5vw] my-[5vh]">
           <Col>
             <Container className="d-flex justify-content-between align-items-center px-[3vh] mb-[2vh]">
               <Row className="d-inline-flex">
@@ -223,7 +263,7 @@ export default function Dashboard() {
                       onChange={(e) => {
                         setProductInput(e.target.value);
                       }}
-                      className="w-[15vw] rounded-none border border-black py-1 px-2"
+                      className="w-[15vw] rounded-none border border-black py-1 px-2 bg-[rgba(0,0,0,0.3)"
                       type="number"
                       placeholder="item #"
                     />
@@ -237,17 +277,31 @@ export default function Dashboard() {
                       placeholder="quantity"
                     />
                     <Label className="text-lg">Mode of Payment</Label>
-                    <select ref={mopRef} title="mop" className="border border-solid border-black py-1 px-2">
+                    <select onChange={(e) => setMop(e.target.value)} ref={mopRef} title="mop" className="border border-solid border-black py-1 px-2">
                       {/* {itemList.map((item, index) => (
                         <option key={index} value={item.product}>
                           {item.product}
                         </option>
                       ))} */}
+                      <option>---</option>
                       <option value='Cash'> Cash</option>
                       <option value='Credit Card'> Credit Card</option>
                       <option value='Gcash'> Gcash</option>
                       <option value='ATM'> ATM</option>
                     </select>
+                    { mop == "Cash"  && 
+                      <>
+                        <Label className="text-lg">Enter Cash</Label>
+                        <input
+                          defaultValue={1}
+                          ref={cashRef}
+                          onChange={(e) => setCash(parseInt(e.target.value))}
+                          className="w-[15vw] rounded-none border border-black py-1 px-2"
+                          type="number"
+                          placeholder="quantity"
+                        />
+                      </>
+                    }
                     { foundProduct && 
                     <Container className="border border-black border-solid px-[2vh] py-[1vh] mt-[5vw]">
                       <h1 className="text-center font-semibold text-lg">Item Details</h1><br/>
@@ -270,9 +324,9 @@ export default function Dashboard() {
                       </pre>
                     </Container>}
                   </Col>
-                  <div className="flex flex-col max-h-[60vh] overflow-y-auto w-full">
+                  <div className="flex flex-col h-[45vh] overflow-y-auto w-full">
                     <Table className="border border-solid border-black">
-                      <TableCaption>A list of your recent invoices.</TableCaption>
+                      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
                       <TableHeader className="sticky top-0 bg-white z-10">
                         <TableRow className="bg-slate-200 border-black">
                           <TableHead className="w-[13vw] text-left text-lg">Product #</TableHead>
@@ -315,19 +369,43 @@ export default function Dashboard() {
                       </TableBody>
                     </Table>
                     <hr className="bg-black" />
-                    { true && <pre className="text-lg font-semibold">
-                    <p className="text-lg">Subtotal:   {subTotal}</p>
-                    <p className="text-xl">Total  :  {total}</p>
-                  </pre>
-                  }
-                </div>
-                  
+                    <div className="px-[5vw] flex fixed bottom-12 justify-evenly">
+                      <div className="border border-black border-solid max-w-[30vw] mx-[5-vw]">
+                        <pre className="">
+                          <h2 className="text-base font-semibold mx-[1vw] my-[1vh]">Manual</h2>
+                          <hr className="my-[1vh] mx-[1vw] border border-black border-solid"/>
+                          <div className="flex flex-col px-[1.25vw] py-[1vh]">
+                            <span className="text-sm">Press Key &quot;n&quot; to input item id</span>
+                            <span className="text-sm">Press Key &quot;t&quot; to add an item</span>
+                            <span className="text-sm">Press Key &quot;m&quot; to select payment method</span>
+                            <span className="text-sm">Press Key &quot;q&quot; to proceed to payment</span>
+                            <span className="text-sm">Press Key &quot;*&quot; to view all product details</span>
+                            <span className="text-sm">Press Key &quot;Escape&quot; to logout</span>
+                          </div>
+                        </pre>
+                      </div>
+                      <div className="w-[5vw]"><pre></pre></div>
+                      { total != 0 && 
+                        <div className="border border-black border-solid px-[1vw] py-[1vh]">
+                          <pre className="">
+                            <div className="flex flex-col ">
+                              <p className="text-lg">Product Subtotal:   {subTotal}</p>
+                              <p className="text-lg">VAT:                {subTotal * (12/100)}</p>
+                              <p className="text-lg">Total Quantity:     {productCart.reduce((acc, product) => acc + product.quantity, 0)}</p>
+                              <div className="my-[1.5vh]">
+                                <hr className="bg-black border border-black"/>
+                              </div>
+                              <p className="text-xl">Total:            {total}</p>
+                            </div>
+                          </pre>
+                        </div>
+                      }
+                    </div>
+                  </div>
                 </Row>
               </Col>
             </Container>
-            
           </Col>
-          
         </Container>
         
       </div>
@@ -362,10 +440,10 @@ export default function Dashboard() {
         >
           <AlertDialogHeader>
             <AlertDialogTitle>Product List</AlertDialogTitle>
-            <AlertDialogDescription className="overflow-y-auto max-h-[50vh]">
-              <div className="max-h-[50vh] overflow-y-auto w-full">
+            <AlertDialogDescription className=" max-h-[50vh]">
+              <div className="max-h-[55vh] overflow-y-auto w-full">
                 <Table ref={productTableRef} className="border border-solid border-black">
-                  <TableCaption>A list of all products</TableCaption>
+                  {/* <TableCaption>A list of all products</TableCaption> */}
                   <TableHeader>
                     <TableRow className="bg-slate-200 border-black">
                       <TableHead className="text-left text-lg">Product ID</TableHead>
@@ -407,28 +485,50 @@ export default function Dashboard() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       <AlertDialog>
-        <AlertDialogTrigger ref={calculateRef} className="hidden">
-          Open
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-semibold">Calculate</AlertDialogTitle>
-            <AlertDialogDescription>
-              <pre className="text-lg ">
-                Total
-              </pre>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+  <AlertDialogTrigger ref={calculateRef} className="hidden">
+    Open
+  </AlertDialogTrigger>
+  <AlertDialogContent className="border border-black border-solid px-[2vh] py-[1vh] max-w-[90vw] min-w-[300px] w-auto">
+    <AlertDialogHeader>
+      <AlertDialogTitle className="text-xl font-semibold text-center">Receipt</AlertDialogTitle>
+      <AlertDialogDescription>
+        <pre className="text-lg">
+          <div className="flex flex-col">
+          <p className="text-lg">Date & Time:            {time}</p>
+            <div className="my-[1.5vh]">
+              <hr className="bg-black border border-black"/>
+            </div>
+            <p className="text-lg">Product Subtotal:     {subTotal}</p>
+            <p className="text-lg">VAT:                  {subTotal * (12/100)}</p>
+            <p className="text-lg">Total Quantity:       {productCart.reduce((acc, product) => acc + product.quantity, 0)}</p>
+            <p className="text-lg">Payment Method:       {mop}</p>
+            <div className="my-[1.5vh]">
+              <hr className="bg-black border border-black"/>
+            </div>
+            <p className="text-xl">Total:              {total}</p>
+            {mop === "Cash" && (
+              <>
+                <div className="my-[1.5vh]">
+                  <hr className="bg-black border border-black"/>
+                </div>
+                <span>Change:               {cash - total}</span>
+              </>
+            )}
+          </div>
+        </pre>
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
     </>
   );
 }

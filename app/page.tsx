@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { headers } from "next/headers"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 
@@ -23,7 +23,11 @@ interface Cashier {
 
 export default function Home() {
 
+  const usernameRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    usernameRef.current?.click();
+  })
   const router = useRouter();
 
   const [ username, setUsername ] = useState('');
@@ -68,7 +72,7 @@ export default function Home() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input onChange={(e) => {setUsername(e.target.value)}} id="username" type="text" required />
+            <Input ref={usernameRef} onChange={(e) => {setUsername(e.target.value)}} id="username" type="text" required />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
