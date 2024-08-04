@@ -20,3 +20,8 @@ export interface ProductCart {
   amount: number
 }
 
+export interface SortConfig {
+  key: number; // or keyof YourDataType if you're using keys from a specific data type
+  direction: 'ascending' | 'descending';
+}
+
