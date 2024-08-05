@@ -1,0 +1,9 @@
+features:
+
+
+generate z & shift reports
+basic crud of products
+set status of products (eg.)
+add cashier
+add supervisor
+

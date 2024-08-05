@@ -103,7 +103,7 @@ export default function Dashboard() {
     setTotal(subTotal* (12/100) + subTotal)
     setQuantityTOtal(getTotalQuantity);
     
-  }, [productCart, subTotal, ])
+  }, [productCart, subTotal ])
 
   useEffect(() => {
     setSession(sessionStorage.fullname);
