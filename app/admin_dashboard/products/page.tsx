@@ -79,6 +79,7 @@ import {
 import { useRef, useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import axios from "axios"
+import type { ProductList } from "@/lib/utils"
 
 interface ProductDetails {
   productName: string
@@ -88,6 +89,8 @@ export default function ProductList() {
 
   const [ productName, setProductName ] = useState('');
   const [ productPrice, setProductPrice ] = useState(0);
+  const [ productList, setProductList ] = useState<ProductList[]>([]);
+  
 
   
 
@@ -99,10 +102,22 @@ export default function ProductList() {
     const getProducts = async () => {
 
       const url = `${process.env.NEXT_PUBLIC_URL}php/product.php`;
+      // or
       const url2 = "http://localhost/git/pos_withDb/php/product.php";
       try {
-        
-        const response = await axios.get(url)
+        const response = await axios.get<ProductList[]>('http://localhost/git/pos_withDb/php/product.php', {
+          params: {operation: 'getProducts'}
+        });
+        console.log(response)
+        const List: ProductList[] = response.data.map(product => ({
+          product_id: product.product_id,
+          product_name: product.product_name,
+          product_price: product.product_price,
+          product_sales: product.product_sales,
+          created_at: product.created_at,
+          status: product.status
+        }));
+        setProductList(List);
       } catch (error) {
         
       }
@@ -135,9 +150,7 @@ export default function ProductList() {
   const addProduct = async () => {
     const url = `${process.env.NEXT_PUBLIC_URL}/php/product.php`;
     console.log('http://localhost/git/pos_withDb/php/product.php')
-    console.log(url);
-    console.log(true)
-
+    console.log(url)
     const productDetails: ProductDetails = {
       productName: productName,
       productPrice: productPrice,
@@ -223,9 +236,7 @@ export default function ProductList() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="hidden w-[100px] sm:table-cell">
-                        <span className="sr-only">Image</span>
-                      </TableHead>
+                      <TableHead>Product ID</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="hidden md:table-cell">
@@ -243,30 +254,32 @@ export default function ProductList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
+                    {productList.map((product, index) => (
+                      <TableRow key={index}>
                       <TableCell className="hidden sm:table-cell">
-                        <Image
+                        {/* <Image
                           alt="Product image"
                           className="aspect-square rounded-md object-cover"
                           height="64"
                           src="/placeholder.svg"
                           width="64"
-                        />
+                        /> */}
+                        <span className="font-semibold">{product.product_id}</span>
                       </TableCell>
                       <TableCell className="font-medium">
-                        Laser Lemonade Machine
+                        {product.product_name}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">Draft</Badge>
+                        <Badge variant="outline">{product.status}</Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        $499.99
+                        {product.product_price}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        25
+                      {product.product_sales}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        2023-07-12 10:42 AM
+                      {product.created_at}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -288,141 +301,8 @@ export default function ProductList() {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        Luminous VR Headset
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Active</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        $199.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        30
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2024-02-14 02:14 PM
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        Luminous VR Headset
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Active</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        $199.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        30
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2024-02-14 02:14 PM
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        Luminous VR Headset
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Active</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        $199.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        30
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2024-02-14 02:14 PM
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    ))}
+                    
                     
                   </TableBody>
                 </Table>

@@ -13,11 +13,12 @@ export function cn(...inputs: ClassValue[]) {
 // }
 
 export interface ProductList {
-  product_id: string
+  product_id: number
   product_name: string
-  price: number
-  total_sales: number
-  date_created: Date
+  product_price: number
+  product_sales: number
+  created_at: string
+  status: string
 }
 export interface ProductCart {
   product_name: string,

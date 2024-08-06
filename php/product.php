@@ -75,7 +75,7 @@ switch ($operation) {
   case "insert":
     echo $product ->create($json);
     break;
-  case "getProduct":
+  case "getProducts":
     echo $product ->getProducts();
     break;
   

@@ -43,6 +43,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import type { NextRequest } from 'next/server'
 
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export default function Header() {
   const pathname = usePathname()
@@ -57,8 +58,9 @@ export default function Header() {
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link href="#" className="flex items-center gap-2 text-lg font-semibold md:text-base">
-            <Package2 className="h-6 w-6" />
-            <span className="sr-only">Acme Inc</span>
+            {/* <Package2 className="h-6 w-6" /> */}
+            <Image src={'/assets/images/ororama.png'} height={120} width={320} alt="ororama" />
+            {/* <span className="sr-only">Acme Inc</span> */}
           </Link>
           <Link href="/admin_dashboard" className={getLinkClass('/admin_dashboard')}>
             Dashboard
@@ -116,9 +118,15 @@ export default function Header() {
           </form>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
+              <Button variant="secondary" size="icon" className="rounded-full h-[7vh] w-[10vw] py-[1vh] px-[1vw] flex justify-center items-center ">
+                <Avatar className='m-[1vh]'>
+                  <AvatarImage src="/assets/gif/pikachu-pixel.gif"  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                {/* <CircleUser className="h-5 w-5" /> */}
+                <span>{sessionStorage.getItem('fullname')}</span>
                 <span className="sr-only">Toggle user menu</span>
+                
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

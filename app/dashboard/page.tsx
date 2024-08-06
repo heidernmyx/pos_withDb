@@ -91,6 +91,31 @@ export default function Dashboard() {
   }, [quantity]);
   
   useEffect(() => {
+    
+    const getProducts = async () => {
+      const url = `${process.env.NEXT_PUBLIC_URL}php/product.php`;
+      // or
+      const url2 = "http://localhost/git/pos_withDb/php/product.php";
+      try {
+        const response = await axios.get<ProductList[]>('http://localhost/git/pos_withDb/php/product.php', {
+          params: {operation: 'getProducts'}
+        });
+        console.log(response)
+        const List: ProductList[] = response.data.map(product => ({
+          product_id: product.product_id,
+          product_name: product.product_name,
+          product_price: product.product_price,
+          // product_sales: product.product_sales,
+          // created_at: product.created_at,
+          // status: product.status
+        }));
+        setProductList(List);
+      } catch (error) {
+        
+      }
+    }
+    getProducts();
+  
     itemRef.current?.focus();
     setQuantity(1);
     setTime(formattedDateTime);
@@ -108,22 +133,6 @@ export default function Dashboard() {
   useEffect(() => {
     setSession(sessionStorage.fullname);
     document.body.style.overflow = 'hidden';
-
-    const fetchItems = async () => {
-      try {
-        const response = await axios.get<ProductList[]>('http://localhost/git/pos/php/product.php');
-        const { data } = response;
-        const List: ProductList[] = data.map(product => ({
-          product_id: product.product_id,
-          product_name: product.product_name,
-          price: product.price
-        }));
-        setProductList(List);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchItems();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       console.log(event.key)
@@ -173,9 +182,9 @@ export default function Dashboard() {
           } else {
             setProductCart([...productCart, {
               product_name: foundProduct?.product_name || '', 
-              price: foundProduct?.price || 0,
+              price: foundProduct?.product_price || 0,
               quantity: quantity,
-              amount: foundProduct!.price * quantity
+              amount: foundProduct!.product_price * quantity
             }]);
           }
 
@@ -428,13 +437,13 @@ export default function Dashboard() {
                           <span className="space-x-">Product Name:   </span><p>{foundProduct?.product_name}</p>
                         </div>
                         <div className="flex justify-between">
-                          <span className="space-x-">Price:   </span><p>{foundProduct?.price}</p>
+                          <span className="space-x-">Price:   </span><p>{foundProduct?.product_price}</p>
                         </div>
                         <div className="flex justify-between">
                           <span>Quantity:   </span><p>{displayQuantity}</p>
                         </div><br/>
                         <div className="flex justify-between">
-                          <strong>Total:   </strong><p>{displayQuantity * foundProduct.price}</p>
+                          <strong>Total:   </strong><p>{displayQuantity * foundProduct.product_price}</p>
                         </div>
                       </pre>
                     </Container>}
@@ -601,7 +610,7 @@ export default function Dashboard() {
                       <TableRow key={index}>
                         <TableCell className="font-medium text-left">{product.product_id}</TableCell>
                         <TableCell className="text-left break-words">{product.product_name}</TableCell>
-                        <TableCell className="text-left">{product.price}</TableCell>
+                        <TableCell className="text-left">{product.product_price}</TableCell>
                         <TableCell className="flex justify-center">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
