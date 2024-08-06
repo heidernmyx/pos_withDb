@@ -8,6 +8,6 @@ export function middleware(request: NextRequest) {
   }
  
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.rewrite(new URL('/dashboard/user', request.url))
+    // return NextResponse.rewrite(new URL('/dashboard', request.url))
   }
 }

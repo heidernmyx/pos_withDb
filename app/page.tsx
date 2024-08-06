@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
-import { Passero_One } from "next/font/google"
 
 interface User {
   username: string,
@@ -35,64 +34,43 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const signIn = async (e: React.FormEvent) => {
+  const login = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // console.log(username, password)
-    // console.log(`${process.env.NEXT_URL}/php/login.php`)
-    try {
-      // const response = await axios<User>(
-      //   'http://localhost/git/pos_withDb/php/login.php',
-      //   {
-      //       username: username,
-      //       password: password
-      //   }
-      //   const response = await axios({
-      //     url: 'http://localhost/git/pos_withDb/php/login.php',
-      //     method: "POST",
-      //     data: formData
-      //   })
-    //   const response = await axios.post('http://localhost/git/pos_withDb/php/login.php', {
-    //     username: username,
-    //     password: password
-    // }, {
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     }
-
-    const jsonData = {
-      header: {username: username , password: password },
-      // detail: detailsList
+    const data = {
+      username: username,
+      password: password,
     };
+    const url = 'http://localhost/git/pos_withDb/app/php/login.php';
+  
+    try {
+      const response = await axios.post(url, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.status === 200) {
+        console.log(true)
+        const result = response.data;
+        if (result) {
+          const {user_id, user_role, username, fullname} = result.data;
 
-        const formData = new FormData();
-    formData.append("operation", "saveInvoice");
-    formData.append("json", JSON.stringify(jsonData));
-    
-    const response = await axios({
-      url: 'http://localhost/git/pos_withDb/php/login.php',
-      method: "POST",
-      data: formData
-    });
-
-      const data = await response.data;
-
-      console.log(data)
-      if (data) {
-        // sessionStorage.setItem('fullname', data.fullname);
-        router.push('/dashb');
+          sessionStorage.setItem('user_id', user_id);
+          sessionStorage.setItem('user_role', user_role);
+          sessionStorage.setItem('fullname', fullname);
+          router.push('/admin_dashboard')
+        } else {
+        }
       } else {
-        // Handle login failure
-        console.log("Invalid username or password");
       }
     } catch (error) {
-      console.error("Error during sign-in:", error);
     }
-  }
+  };
 
   return (
     <div className="flex h-screen justify-center items-center">
       <Card className="w-full max-w-sm">
-        <form onSubmit={signIn}>
+        <form onSubmit={login}>
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
@@ -103,11 +81,11 @@ export default function Home() {
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
               <Input ref={usernameRef} onChange={(e) => { setUsername(e.target.value) }} id="username" type="text" required />
-            </div>
+            </div><>{username}</>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <Input onChange={(e) => { setPassword(e.target.value) }} id="password" type="password" required />
-            </div>
+            </div><>{password}</>
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full">Sign in</Button>
