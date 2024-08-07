@@ -360,7 +360,7 @@ export default function Dashboard() {
   return (
     <>
       <div className="">
-        <Container className="h-[90vh] p-[2vh] bg-gray-300 border border-black mx-[5vw] my-[5vh]">
+        <Container className="h-[90vh] p-[2vh] bg-red-100 border border-black mx-[5vw] my-[5vh]">
           <Col>
             <Container className="d-flex justify-content-between align-items-center px-[3vh] mb-[2vh]">
               <Row className="d-inline-flex">

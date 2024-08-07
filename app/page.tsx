@@ -36,7 +36,7 @@ export default function Home() {
 
   const login = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = 'http://localhost/git/pos_withDb/php/login.php';
+    const url = `${process.env.NEXT_PUBLIC_URL}/php/login.php`;
     const data = {
       username: username,
       password: password,
