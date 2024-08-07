@@ -97,7 +97,7 @@ export default function Dashboard() {
       // or
       const url2 = "http://localhost/git/pos_withDb/php/product.php";
       try {
-        const response = await axios.get<ProductList[]>('http://localhost/git/pos_withDb/php/product.php', {
+        const response = await axios.get<ProductList[]>(`${process.env.NEXT_PUBLIC_URL}/php/product.php`, {
           params: {operation: 'getActiveProducts'}
         });
         console.log(response)

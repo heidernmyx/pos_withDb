@@ -98,12 +98,10 @@ export default function ProductList() {
   
   const [ newName, setNewName ] = useState('');
   const [ newPrice, setNewPrice ] = useState(0);
-  const [ newStatus, setNewStatus ] = useState('');
+  const [ newStatus, setNewStatus ] = useState('Active');
   const [ selectedProductID, setSelectedProductId ] = useState(0);
 
   const [ productList, setProductList ] = useState<ProductList[]>([]);
-  
-
   
 
   const addItemRef = useRef<HTMLButtonElement>(null);
@@ -191,6 +189,7 @@ export default function ProductList() {
       productPrice: newPrice,
       productStatus: newStatus
     }
+    console.log(updateProductDets);
     const formData = new FormData();
     formData.append('operation', 'update');
     formData.append('json', JSON.stringify(updateProductDets));
@@ -210,7 +209,7 @@ export default function ProductList() {
     const formData = new FormData();
     formData.append('operation', 'delete');
     formData.append('selectedProductID', selectedProductID.toString());
-
+    console.log(formData);
     const response = await axios({
       url: url,
       method: "POST",
@@ -370,6 +369,8 @@ export default function ProductList() {
           </TabsContent>
         </Tabs>
       </main>
+
+
       <AlertDialog>
         <AlertDialogTrigger ref={addItemRef} className="hidden">
           Open
@@ -380,7 +381,7 @@ export default function ProductList() {
             <AlertDialogDescription className="flex flex-col">
               <Label className="pr-[1vw] mb-[1vh]">Product Name:</Label>
               <Input
-                onChange={(e) => setProductName('')}
+                onChange={(e) => setProductName(e.target.value)}
                 ref={productInputRef}
                 type="text"
                 placeholder=""
@@ -403,6 +404,9 @@ export default function ProductList() {
           <AlertDialogFooter></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+
+
       <AlertDialog>
         <AlertDialogTrigger ref={editItemRef} className="hidden">
           Open
@@ -439,7 +443,7 @@ export default function ProductList() {
                 className="pl-4 w-full text-black mb-[1vh]"
               />
               <Label className="pr-[1vw] mb-[1vh]">Product Price:</Label>
-              <select onChange={(e) => setNewStatus(e.target.value)} className="flex h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
+              <select onChange={(e) => setNewStatus(e.target.value)} value={newStatus}  className="flex h-10 w-full text-black rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
                 <option value="Discontinued">Discontinued</option>

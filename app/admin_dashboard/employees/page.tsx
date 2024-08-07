@@ -88,7 +88,6 @@ const EmployeeList = () => {
   const addEmployee = async() => {
     const url = `${process.env.NEXT_PUBLIC_URL}/php/add_employee.php`;
 
-
     const employeeDetails: AddEmployeeDetails = {
       user_role: employeeType,
       username: employeeUsername,
@@ -107,6 +106,8 @@ const EmployeeList = () => {
     })
 
     console.log(response.data);
+
+    
     
   }
 
