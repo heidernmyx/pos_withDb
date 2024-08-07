@@ -4,7 +4,7 @@ import Image from "next/image";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +44,12 @@ import { ProductList, ProductCart } from "@/lib/utils";
 import { exit } from "process";
 import { useRouter } from "next/navigation";
 
+
+interface SortConfig {
+  key: string | null;
+  direction: 'ascending' | 'descending';
+}
+
 export default function Dashboard() {
   
   const router = useRouter();
@@ -59,7 +65,7 @@ export default function Dashboard() {
   const [ cash, setCash ] = useState(0);
   const [ time, setTime ] = useState('');
   const [ selectedIndex, setSelectedIndex ] = useState(0);
-  const [ sortConfig, setSortConfig ] = useState({ key: null, direction: 'ascending' });
+  const [ sortConfig, setSortConfig ] = useState<SortConfig>({ key: null, direction: 'ascending' });
   const [ date, setDate ] = useState('');
   const [ newQuantity, SetNewQuantity ] = useState(0);
   const [ isOpen, setIsOpen ] = useState(false);
@@ -85,7 +91,7 @@ export default function Dashboard() {
   const amountsortRef = useRef<HTMLTableCellElement>(null);
 
   const formattedDateTime = new Date().toLocaleString();
-
+  
   useEffect(() => {
     console.log('Quantity:', quantity);
   }, [quantity]);
@@ -93,21 +99,18 @@ export default function Dashboard() {
   useEffect(() => {
     
     const getProducts = async () => {
-      const url = `${process.env.NEXT_PUBLIC_URL}php/product.php`;
-      // or
-      const url2 = "http://localhost/git/pos_withDb/php/product.php";
       try {
         const response = await axios.get<ProductList[]>(`${process.env.NEXT_PUBLIC_URL}/php/product.php`, {
-          params: {operation: 'getActiveProducts'}
+          params: {operation: 'getProducts'}
         });
         console.log(response)
         const List: ProductList[] = response.data.map(product => ({
           product_id: product.product_id,
           product_name: product.product_name,
           product_price: product.product_price,
-          // product_sales: product.product_sales,
-          // created_at: product.created_at,
-          // status: product.status
+          product_sales: product.product_sales,
+          created_at: product.created_at,
+          status: product.status
         }));
         setProductList(List);
       } catch (error) {
@@ -117,14 +120,12 @@ export default function Dashboard() {
     getProducts();
   
     itemRef.current?.focus();
-    setQuantity(1);
     setTime(formattedDateTime);
 
   }, [])
 
   useEffect(() => {
     setSubTotal(getTotal)
-    setQuantity(1);
     setTotal(subTotal* (12/100) + subTotal)
     setQuantityTOtal(getTotalQuantity);
     
@@ -135,7 +136,6 @@ export default function Dashboard() {
     document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      console.log(event.key)
       if (event.key === '+') {
         alertDialogRef.current?.click();
       }
@@ -160,46 +160,46 @@ export default function Dashboard() {
         // handle escape
         sessionStorage.clear();
         router.push('/');
-      } else if (event.key === 't' || event.key === 'T') {
-        const validation = quantity === 0 ? false: true;
+      } 
+      else if (event.key === 't' || event.key === 'T') {
+        const validation = quantity !== 0 ? true : false;
         if (validation) {
           const foundProduct = productList.find(product => product.product_id.toString() === inputProduct);
-
+      
           if (!foundProduct) {
-            alert('Enter valid Item ID!')
+            alert('Enter valid Item ID!');
             return;
           }
           setFoundProduct(foundProduct);
-          
+      
           const existingProductIndex = productCart.findIndex(product => product.product_name === foundProduct?.product_name);
-          
+      
           if (existingProductIndex !== -1) {
             const updatedCart = [...productCart];
             updatedCart[existingProductIndex].quantity += quantity;
             updatedCart[existingProductIndex].amount = updatedCart[existingProductIndex].price * updatedCart[existingProductIndex].quantity;
             setProductCart(updatedCart);
-
+      
           } else {
             setProductCart([...productCart, {
-              product_name: foundProduct?.product_name || '', 
+              product_name: foundProduct?.product_name || '',
               price: foundProduct?.product_price || 0,
-              quantity: quantity,
+              quantity: Number(quantityRef.current?.value),
               amount: foundProduct!.product_price * quantity
             }]);
           }
-
+      
           setDisplayQuantity(quantity);
           setProductInput('');
-          setQuantity(1);
           quantityRef.current?.blur();
-          quantityRef.current!.value = '1';
-
-        } else if (!validation) {
+          // quantityRef.current!.value = '1';
+      
+        } else {
           alert('Enter a valid Quantity!');
-          console.log(quantity)
-          return;
+          console.log(quantity);
         }
-      } 
+      }
+
       else if (event.key === "q") {
         // i = i + 1;
         // console.log(i)
@@ -316,27 +316,36 @@ export default function Dashboard() {
   const updateItemQty = (index: number, newQuantity: number) => {
     console.log(index, newQuantity)
     const updatedCart = [...productCart];
-            updatedCart[index].quantity = newQuantity;
+            updatedCart[index].quantity =+ newQuantity;
+            updatedCart[index].amount = updatedCart[index].price * updatedCart[index].quantity;
+  
+    setProductCart(updatedCart);
+  };
+  const addItemQty = (index: number, newQuantity: number) => {
+    console.log(index, newQuantity)
+    const updatedCart = [...productCart];
+            updatedCart[index].quantity += newQuantity;
             updatedCart[index].amount = updatedCart[index].price * updatedCart[index].quantity;
   
     setProductCart(updatedCart);
   };
 
   const sortData = (key: string) => {
-    let direction = 'ascending';
+    let direction: 'ascending' | 'descending' = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
     setSortConfig({ key, direction });
   };
-
+  
   const sortedProductCart = [...productCart].sort((a, b) => {
     if (sortConfig.key) {
-      let aKey = a[sortConfig.key];
-      let bKey = b[sortConfig.key];
+      const key = sortConfig.key as keyof ProductCart; // Ensures key is a valid ProductCart property
+      let aKey = a[key];
+      let bKey = b[key];
   
       // Convert to number if the key is 'price', 'quantity', or 'amount'
-      if (['price', 'quantity', 'amount'].includes(sortConfig.key)) {
+      if (['price', 'quantity', 'amount'].includes(key)) {
         aKey = Number(aKey);
         bKey = Number(bKey);
       }
@@ -393,11 +402,11 @@ export default function Dashboard() {
                     />
                     <Label className="text-lg">Quantity</Label>
                     <input
-                      defaultValue={1}
+                      value={quantity}
                       ref={quantityRef}
                       onChange={(e) => setQuantity(parseInt(e.target.value))}
                       className="w-[15vw] rounded-none border border-black py-1 px-2"
-                      type="number"
+                      type="number" 
                       placeholder="quantity"
                     />
                     <Label className="text-lg">Mode of Payment</Label>
@@ -560,7 +569,6 @@ export default function Dashboard() {
             </Container>
           </Col>
         </Container>
-        
       </div>
       <AlertDialog>
         <AlertDialogTrigger ref={alertDialogRef} className="hidden">
@@ -585,16 +593,18 @@ export default function Dashboard() {
       </AlertDialog>
 
       <AlertDialog>
-        <AlertDialogTrigger ref={productListRef} className="hidden" />
-        <AlertDialogContent
-          ref={alertContentRef}
+        <AlertDialogTrigger ref={productListRef} className="hidden">
+        </AlertDialogTrigger>
+        <AlertDialogContent 
+          ref={alertContentRef} 
           className="w-[600px] max-w-[90vw] max-h-[70vh] overflow-hidden"
         >
           <AlertDialogHeader>
             <AlertDialogTitle>Product List</AlertDialogTitle>
-            <AlertDialogDescription className="max-h-[50vh]">
+            <AlertDialogDescription className=" max-h-[50vh]">
               <div className="max-h-[55vh] overflow-y-auto w-full">
-                <Table ref={productTableRef} className="border border-solid border-black p-[3vw]">
+                <Table ref={productTableRef} className="border border-solid border-black">
+                  {/* <TableCaption>A list of all products</TableCaption> */}
                   <TableHeader>
                     <TableRow className="bg-slate-200 border-black">
                       <TableHead className="text-left text-lg">Product ID</TableHead>
@@ -635,9 +645,9 @@ export default function Dashboard() {
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="h-[4vh]">
-            {/* <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Continue</AlertDialogAction> */}
+          <AlertDialogFooter>
+            {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
+            <AlertDialogAction>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -710,26 +720,24 @@ export default function Dashboard() {
       </AlertDialogContent>
     </AlertDialog>
 
-      <AlertDialog>
-        <AlertDialogTrigger ref={updateQtyRef} className="hidden">Open</AlertDialogTrigger>
-        <AlertDialogContent className="w-[18vw]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <div>
-                <Label htmlFor="username text-lg mb-1">Enter new Quantity</Label>
-                <Input className="outline" onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}} id="username" type="number" required />
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {updateItemQty(selectedIndex, newQuantity)}}>Continue</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-
+<AlertDialog>
+  <AlertDialogTrigger ref={updateQtyRef} className="hidden">Open</AlertDialogTrigger>
+  <AlertDialogContent className="w-[18vw]">
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        <div>
+          <Label htmlFor="username text-lg mb-1">Enter new Quantity</Label>
+          <Input className="outline" onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}} id="username" type="number" required />
+        </div>
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={() => {updateItemQty(selectedIndex, newQuantity)}}>Continue</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
     </>
   );
 }

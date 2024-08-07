@@ -44,8 +44,14 @@ import type { NextRequest } from 'next/server'
 
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function Header() {
+
+  const [ session, setSession ] = useState<string | null>(null);
+
+  // const data = sessionStorage.getItem('fullname');
+  // setSession(data);
   const pathname = usePathname()
   const getLinkClass = (path: string) => {
     return pathname === path
@@ -118,7 +124,7 @@ export default function Header() {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 {/* <CircleUser className="h-5 w-5" /> */}
-                <span>{sessionStorage.getItem('fullname')}</span>
+                <span>{session}</span>
                 <span className="sr-only">Toggle user menu</span>
                 
               </Button>

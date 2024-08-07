@@ -20,6 +20,11 @@ export interface ProductList {
   created_at: string
   status: string
 }
+export interface CashierProductInterface {
+  product_id: number
+  product_name: string
+  product_price: number
+}
 export interface ProductCart {
   product_name: string,
   price: number,
@@ -39,4 +44,11 @@ export interface AddEmployeeDetails {
   username: string,
   password: string,
   fullname: string
+}
+
+export interface EmployeeDetails{
+  employee_id: number,
+  fullname: string,
+  user_role: string,
+  date_added: string
 }

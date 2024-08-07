@@ -71,29 +71,39 @@ import {
 import { useRef, useState, useEffect } from "react"
 import { Label } from "@/components/ui/label";
 import axios from 'axios';
-import { AddEmployeeDetails } from '@/lib/utils'
+import { AddEmployeeDetails, EmployeeDetails } from '@/lib/utils'
 
+export default function EmployeeList() {
 
-
-
-const EmployeeList = () => {
+  // console.log(true)
+  useEffect(() => {
+    const getEmployee = async () => {
+      const response = await axios.get<EmployeeDetails>(`${process.env.NEXT_PUBLIC_URL}/php/employee.php`, {
+        params: {operation: "getEmployee"}
+      })
+      
+      console.log(response);
+    }
+    // getEmployee
+    getEmployee();
+  }, [])
 
   const [ employeeUsername, setEmployeeUsername ] = useState('');
   const [ employeePassword, setEmployeePassword ] = useState('');
   const [ employeeFullname, seEmployeeFullname ] = useState('');
-  const [ employeeType, setEmployeeType ] = useState(0);
+  const [ employeeType, setEmployeeType ] = useState(1);
 
   const addEMployeeRef = useRef<HTMLButtonElement>(null);
 
-  const addEmployee = async() => {
-    const url = `${process.env.NEXT_PUBLIC_URL}/php/add_employee.php`;
-
+  const addEmployee = async () => {
+    const url = `${process.env.NEXT_PUBLIC_URL}/php/employee.php`;
     const employeeDetails: AddEmployeeDetails = {
       user_role: employeeType,
       username: employeeUsername,
       password: employeePassword,
       fullname: employeeFullname,
     }
+    console.log(employeeDetails)
 
     const formData = new FormData();
     formData.append('operation', 'addEmployee');
@@ -106,11 +116,7 @@ const EmployeeList = () => {
     })
 
     console.log(response.data);
-
-    
-    
   }
-
 
   return (
     <>
@@ -292,13 +298,13 @@ const EmployeeList = () => {
                 className="pl-4 w-full text-black mb-[1vh]"
               />
               <Label className="pr-[1vw] mb-[1vh]">Employee Type:</Label>
-              <select onChange={(e) => setEmployeeType(parseInt(e.target.value))} className="flex text-black h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
+              <select onChange={(e) => setEmployeeType(parseInt(e.target.value))} defaultValue={1} className="flex text-black h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
                 <option value="1">Cashier</option>
                 <option value="2">Supervisor</option>
-              </select>
+              </select><>{employeeType}</>
               <div className="flex mt-[5vh] justify-between">
                 <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => addEmployee()} className="w-[45%]">Update Product</AlertDialogAction>
+                <AlertDialogAction onClick={() => addEmployee()} className="w-[45%]">Add Employee</AlertDialogAction>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -309,4 +315,4 @@ const EmployeeList = () => {
   )
 }
 
-export default EmployeeList;
+;
