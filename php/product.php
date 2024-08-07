@@ -40,6 +40,19 @@ class Product {
 
       // Use single or double quotes for the SQL query string
       $sql = 'SELECT * FROM tbl_products';
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      unset($conn); 
+      unset($stmt);
+      return json_encode($result);
+    }
+
+    public function getActiveProducts() {
+      include '../php/connection.php';
+
+      // Use single or double quotes for the SQL query string
+      $sql = "SELECT product_id, product_name, product_price FROM tbl_products WHERE status='Active'";
   
       $stmt = $conn->prepare($sql);
       $stmt->execute();
@@ -48,8 +61,42 @@ class Product {
       unset($stmt);
       return json_encode($result);
     }
-    
 
+    public function updateProduct($json,) {
+      // echo $json;
+      // die;
+      $json = json_decode($json, true);
+      include '../php/connection.php';
+      $sql = 'UPDATE tbl_products
+        SET
+          product_name = :product_name,
+          product_price = :product_price,
+          status = :status
+        WHERE
+          product_id = :product_id';
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':product_name', $json['productName'], PDO::PARAM_STR);
+      $stmt->bindParam(':product_price', $json['productPrice'], PDO::PARAM_STR);
+      $stmt->bindParam(':status', $json['productStatus'], PDO::PARAM_STR);
+      $stmt->bindParam(':product_id', $json['productID'], PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $result = $stmt->rowCount() > 0;
+      unset($conn); unset($stmt);
+      return json_encode($result);
+    }
+
+    public function deleteProduct(){
+      include '../php/connection.php';
+
+      $sql= 'DELETE FROM tbl_products WHERE product_id = :product_id';
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':product_id', $_POST['selectedProductID'], PDO::PARAM_INT);
+      $stmt->execute();
+      $result = $stmt->rowCount() > 0 ? 1 : 0;
+      unset($conn); unset($stmt);
+      return json_encode($result);
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -73,13 +120,21 @@ else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 $product = new Product();
 switch ($operation) {
   case "insert":
-    echo $product ->create($json);
+    echo $product->create($json);
     break;
   case "getProducts":
-    echo $product ->getProducts();
+    echo $product->getProducts();
     break;
-  
+  case "getActiveProducts":
+    echo $product->getActiveProducts();
+    break;
+  case "update":
+    echo $product->updateProduct($json);
+    break;
+  case "delete":
+    echo $product->deleteProduct();
+    break;
   default:
-    echo "Your favorite color is neither red, blue, nor green!";
+    echo "Error";
 };
 

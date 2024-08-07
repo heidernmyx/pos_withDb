@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // export interface ProductList {
 //   product_id: string;
-//   product_name: string
+//   product_name: stringy
 //   price: number;
 // }
 

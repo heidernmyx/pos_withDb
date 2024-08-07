@@ -71,7 +71,17 @@ import {
 import { useRef, useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 
-const CashierList = () => {
+const EmployeeList = () => {
+
+  const [ employeeUsername, setEmployeeUsername ] = useState('');
+  const [ employeePassword, setEmployeePassword ] = useState('');
+  const [ employeeFullname, seEmployeeFullname ] = useState('');
+  const [ employeeType, setEmployeeType ] = useState('');
+
+  const addCashierRef = useRef<HTMLButtonElement>(null);
+
+
+
   return (
     <>
       <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 flex-col md:p-8">
@@ -80,9 +90,9 @@ const CashierList = () => {
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="draft">Draft</TabsTrigger>
+              <TabsTrigger value="draft">Inactive</TabsTrigger>
               <TabsTrigger value="archived" className="hidden sm:flex">
-                Archived
+                Discontinued
               </TabsTrigger>
             </TabsList>
             <div className="ml-auto flex items-center gap-2">
@@ -99,12 +109,12 @@ const CashierList = () => {
                   <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuCheckboxItem checked>
-                    Active
+                    Cashier
                   </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem>
-                    Archived
-                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem>Employee</DropdownMenuCheckboxItem>
+                  {/* <DropdownMenuCheckboxItem>
+                    Discontinued
+                  </DropdownMenuCheckboxItem> */}
                 </DropdownMenuContent>
               </DropdownMenu>
               {/* <Button size="sm" variant="outline" className="h-8 gap-1">
@@ -126,7 +136,7 @@ const CashierList = () => {
           <TabsContent value="all">
             <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader>
-                <CardTitle>Cashiers</CardTitle>
+                <CardTitle>Employees</CardTitle>
                 <CardDescription>
                   Manage your products and view their sales performance.
                 </CardDescription>
@@ -136,9 +146,10 @@ const CashierList = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="hidden w-[100px] sm:table-cell">
-                        <span className="sr-only">Image</span>
+                        {/* <span className="sr-only">Employee ID:</span> */}
+                        Employee ID:
                       </TableHead>
-                      <TableHead>Name</TableHead>
+                      <TableHead>Employee Name</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="hidden md:table-cell">
                         Price
@@ -200,142 +211,6 @@ const CashierList = () => {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        Luminous VR Headset
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Active</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        $199.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        30
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2024-02-14 02:14 PM
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        Luminous VR Headset
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Active</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        $199.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        30
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2024-02-14 02:14 PM
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        Luminous VR Headset
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Active</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        $199.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        30
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2024-02-14 02:14 PM
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    
                   </TableBody>
                 </Table>
               </CardContent>
@@ -349,8 +224,59 @@ const CashierList = () => {
           </TabsContent>
         </Tabs>
       </main>
+      <AlertDialog>
+        <AlertDialogTrigger ref={addCashierRef} className="hidden">
+          Open
+        </AlertDialogTrigger>
+        <AlertDialogContent className="w-[27vw] px-[4vw] py-[5vh]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">Add New Employee</AlertDialogTitle>
+            <br />
+            <AlertDialogDescription className="flex flex-col">
+              {/* <div className="mb-[1vh] flex justify-start items-center space-x-2">
+                <Label className="text-lg font-semibold">Product ID: </Label>
+                <span className="font-semibold">{selectedProductID}</span>
+              </div> */}
+              <Label className="pr-[1vw] mb-[1vh]">Employee Username:</Label>
+              <Input
+                onChange={(e) => setEmployeeUsername(e.target.value)}
+                // ref={}
+                // value={newName}
+                type="text"
+                placeholder=""
+                className="pl-4 w-full text-black mb-[1vh]"
+              />
+              <br />
+              <Label className="pr-[1vw] mb-[1vh]">Employee Password:</Label>
+              <Input
+                onChange={(e) => setEmployeePassword(e.target.value)}
+                type="password"
+                placeholder=""
+                className="pl-4 w-full text-black mb-[1vh]"
+              />
+              <Label className="pr-[1vw] mb-[1vh]">Employee Fullname:</Label>
+              <Input
+                onChange={(e) => seEmployeeFullname(e.target.value)}
+                type="password"
+                placeholder=""
+                className="pl-4 w-full text-black mb-[1vh]"
+              />
+              <Label className="pr-[1vw] mb-[1vh]">Employee Type:</Label>
+              <select onChange={(e) => setEmployeeType(e.target.value)} className="flex h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
+                <option value="Cashier">Cashier</option>
+                <option value="Supervisor">Supervisor</option>
+              </select>
+              <div className="flex mt-[5vh] justify-between">
+                {/* <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => editProduct(selectedProductID, newName, newPrice)} className="w-[45%]">Update Product</AlertDialogAction> */}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
 
-export default CashierList
+export default EmployeeList;

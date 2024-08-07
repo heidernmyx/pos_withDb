@@ -85,10 +85,22 @@ interface ProductDetails {
   productName: string
   productPrice: number
 }
+interface UpdateProductDetails {
+  productID: number
+  productName: string
+  productPrice: number
+  productStatus: string
+}
 export default function ProductList() {
 
   const [ productName, setProductName ] = useState('');
   const [ productPrice, setProductPrice ] = useState(0);
+  
+  const [ newName, setNewName ] = useState('');
+  const [ newPrice, setNewPrice ] = useState(0);
+  const [ newStatus, setNewStatus ] = useState('');
+  const [ selectedProductID, setSelectedProductId ] = useState(0);
+
   const [ productList, setProductList ] = useState<ProductList[]>([]);
   
 
@@ -96,6 +108,7 @@ export default function ProductList() {
 
   const addItemRef = useRef<HTMLButtonElement>(null);
   const productInputRef = useRef<HTMLInputElement>(null);
+  const editItemRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     
@@ -159,20 +172,55 @@ export default function ProductList() {
     formData.append('operation', 'insert');
     formData.append('json', JSON.stringify(productDetails));
 
-
     const response = await axios({
       url: url,
       method: 'POST',
       data: formData
     })
-    // var response = await axios.post(url, {
-    //   params:{json: JSON.stringify(productDetails), operation: "insert"}
-    // });
     console.log(response);
-    //check if valid user
-    
   }
 
+  const editProduct = async(selectedProductID: number, newName: string, newPrice: number) => {
+    const url = `${process.env.NEXT_PUBLIC_URL}/php/product.php`;
+    // console.log(first)
+    const updateProductDets: UpdateProductDetails= {
+      productID: selectedProductID,
+      productName: newName,
+      productPrice: newPrice,
+      productStatus: newStatus
+    }
+    const formData = new FormData();
+    formData.append('operation', 'update');
+    formData.append('json', JSON.stringify(updateProductDets));
+
+    const response = await axios({
+      url: url,
+      method: "POST",
+      data: formData
+    });
+
+    const { data } = response;
+    console.log(data);
+  }
+
+  const deleteProduct = async(selectedProductID: number) => {
+    const url = `${process.env.NEXT_PUBLIC_URL}/php/product.php`;
+    const formData = new FormData();
+    formData.append('operation', 'delete');
+    formData.append('selectedProductID', selectedProductID.toString());
+
+    const response = await axios({
+      url: url,
+      method: "POST",
+      data: formData
+    });
+
+    const { data } = response;
+    console.log(data);
+    // if () {
+
+    // }
+  }
   
 
   return (
@@ -217,7 +265,7 @@ export default function ProductList() {
                 </span>
               </Button> */}
               <Button size="sm" className="h-8 gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
+                <PlusCircle className="h-3.5 w-3.5"/>
                 <span onClick={() => {addItemRef.current?.click(); productInputRef.current?.focus()}} className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                   Add Product
                 </span>
@@ -264,13 +312,13 @@ export default function ProductList() {
                           src="/placeholder.svg"
                           width="64"
                         /> */}
-                        <span className="font-semibold">{product.product_id}</span>
+                        <span className="font-semibold text-base">{product.product_id}</span>
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-base">
                         {product.product_name}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{product.status}</Badge>
+                        <Badge variant="outline" className="text-base px-[1vw] py-[1vh]">{product.status}</Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {product.product_price}
@@ -295,15 +343,18 @@ export default function ProductList() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              editItemRef.current?.click();
+                              setSelectedProductId(product.product_id);
+                              setNewName(product.product_name);
+                              setNewPrice(product.product_price)
+                            }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => deleteProduct(product.product_id)}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
                     ))}
-                    
-                    
                   </TableBody>
                 </Table>
               </CardContent>
@@ -324,23 +375,23 @@ export default function ProductList() {
         <AlertDialogContent className="w-[27vw] px-[4vw] py-[5vh]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center">Add New Item</AlertDialogTitle>
-            <br/>
+            <br />
             <AlertDialogDescription className="flex flex-col">
-              <Label className="pr-[1vw] mb-[1vh] ">Product Name:</Label>
+              <Label className="pr-[1vw] mb-[1vh]">Product Name:</Label>
               <Input
-                onChange={(e) => setProductName(e.target.value)}
+                onChange={(e) => setNewName('')}
                 ref={productInputRef}
                 type="text"
                 placeholder=""
-                className="pl-4 w-[100%] text-black sm:w-[300px] md:w-[200px] lg:w-[300px] "
+                className="pl-4 w-full text-black mb-[1vh]"
               />
-              <br/>
+              <br />
               <Label className="pr-[1vw] mb-[1vh]">Product Price:</Label>
               <Input
                 onChange={(e) => setProductPrice(Number(e.target.value))}
                 type="number"
                 placeholder=""
-                className="pl-4 sm:w-[300px] text-black md:w-[200px] lg:w-[300px]"
+                className="pl-4 w-full text-black mb-[1vh]"
               />
               <div className="flex mt-[5vh] justify-between">
                 <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
@@ -348,11 +399,60 @@ export default function ProductList() {
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            
-          </AlertDialogFooter>
+          <AlertDialogFooter></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog>
+        <AlertDialogTrigger ref={editItemRef} className="hidden">
+          Open
+        </AlertDialogTrigger>
+        <AlertDialogContent className="w-[27vw] px-[4vw] py-[5vh]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">Update Product: {newName}</AlertDialogTitle>
+            <br />
+            <AlertDialogDescription className="flex flex-col">
+              <div className="mb-[1vh] flex justify-start items-center space-x-2">
+                <Label className="text-lg font-semibold">Product ID: </Label>
+                <span className="font-semibold">{selectedProductID}</span>
+              </div>
+              <Label className="pr-[1vw] mb-[1vh]">Product Name:</Label>
+              <Input
+                onChange={(e) => setNewName(e.target.value)}
+                ref={productInputRef}
+                value={newName}
+                type="text"
+                placeholder=""
+                className="pl-4 w-full text-black mb-[1vh]"
+              />
+              <br />
+              <Label className="pr-[1vw] mb-[1vh]">Product Price:</Label>
+              <Input
+                onChange={(e) => {
+                  const value = Math.max(0, Number(e.target.value));
+                  setNewPrice(value);
+                }}
+                type="number"
+                value={newPrice}
+                placeholder=""
+                className="pl-4 w-full text-black mb-[1vh]"
+              />
+              <Label className="pr-[1vw] mb-[1vh]">Product Price:</Label>
+              <select onChange={(e) => setNewStatus(e.target.value)} className="flex h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Discontinued">Discontinued</option>
+              </select>
+              <div className="flex mt-[5vh] justify-between">
+                <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => editProduct(selectedProductID, newName, newPrice)} className="w-[45%]">Update Product</AlertDialogAction>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </>
   )
 }

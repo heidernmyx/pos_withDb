@@ -65,14 +65,11 @@ export default function Header() {
           <Link href="/admin_dashboard" className={getLinkClass('/admin_dashboard')}>
             Dashboard
           </Link>
-          {/* <Link href="/orders" className={getLinkClass('/orders')}>
-            Orders
-          </Link> */}
           <Link href="/admin_dashboard/products" className={getLinkClass('/admin_dashboard/products')}>
             Products
           </Link>
-          <Link href="/admin_dashboard/cashiers" className={getLinkClass('/admin_dashboard/cashiers')}>
-            Cashiers
+          <Link href="/admin_dashboard/employees" className={getLinkClass('/admin_dashboard/cashiers')}>
+            Employee
           </Link>
           <Link href="/admin_dashboard/analytics" className={getLinkClass('/admin_dashboard/analytics')}>
             Analytics
@@ -91,19 +88,16 @@ export default function Header() {
                 <Package2 className="h-6 w-6" />
                 <span className="sr-only">Acme Inc</span>
               </Link>
-              <Link href="/dashboard" className={getLinkClass('/dashboard')}>
+              <Link href="/admin_dashboard" className={getLinkClass("/admin_dashboard")}>
                 Dashboard
               </Link>
-              <Link href="/orders" className={getLinkClass('/orders')}>
-                Orders
-              </Link>
-              <Link href="/products" className={getLinkClass('/products')}>
+              <Link href="/admin_dashboard/products" className={getLinkClass("/admin_dashboard/products")}>
                 Products
               </Link>
-              <Link href="/customers" className={getLinkClass('/customers')}>
-                Customers
+              <Link href="/admin_dashboard/analytics" className={getLinkClass('/admin_dashboard/employees')}>
+                Employees
               </Link>
-              <Link href="/analytics" className={getLinkClass('/analytics')}>
+              <Link href="/admin_dashboard/analytics" className={getLinkClass("/admin_dashboard/analytics")}>
                 Analytics
               </Link>
             </nav>

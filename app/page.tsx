@@ -36,32 +36,43 @@ export default function Home() {
 
   const login = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const url = 'http://localhost/git/pos_withDb/php/login.php';
     const data = {
       username: username,
       password: password,
     };
-    const url = 'http://localhost/git/pos_withDb/app/php/login.php';
-  
+    
+    const formData = new FormData();
+    formData.append('json', JSON.stringify(data))
     try {
-      const response = await axios.post(url, data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await axios({
+        url: url,
+        method: "POST",
+        data: formData
       });
-      
-      if (response.status === 200) {
-        console.log(true)
-        const result = response.data;
-        if (result) {
-          const {user_id, user_role, username, fullname} = result.data;
 
-          sessionStorage.setItem('user_id', user_id);
-          sessionStorage.setItem('user_role', user_role);
-          sessionStorage.setItem('fullname', fullname);
-          router.push('/admin_dashboard')
-        } else {
-        }
-      } else {
+      console.log(response.data.user_role );
+      const { user_id, user_role, fullname } = response.data;
+      
+      
+      if (user_role == 1) {
+        sessionStorage.setItem('user_id', user_id);
+        sessionStorage.setItem('user_role', user_role);
+        sessionStorage.setItem('fullname', fullname);
+        
+        router.push('/dashboard')
+
+      } 
+      else if (user_role == 2){
+        
+      }
+      
+      else if (user_role == 3){
+        sessionStorage.setItem('user_id', user_id);
+        sessionStorage.setItem('user_role', user_role);
+        sessionStorage.setItem('fullname', fullname);
+        
+        router.push('/admin_dashboard')
       }
     } catch (error) {
     }
@@ -81,11 +92,11 @@ export default function Home() {
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
               <Input ref={usernameRef} onChange={(e) => { setUsername(e.target.value) }} id="username" type="text" required />
-            </div><>{username}</>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <Input onChange={(e) => { setPassword(e.target.value) }} id="password" type="password" required />
-            </div><>{password}</>
+            </div>
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full">Sign in</Button>

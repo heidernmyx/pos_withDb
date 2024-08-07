@@ -98,7 +98,7 @@ export default function Dashboard() {
       const url2 = "http://localhost/git/pos_withDb/php/product.php";
       try {
         const response = await axios.get<ProductList[]>('http://localhost/git/pos_withDb/php/product.php', {
-          params: {operation: 'getProducts'}
+          params: {operation: 'getActiveProducts'}
         });
         console.log(response)
         const List: ProductList[] = response.data.map(product => ({
@@ -585,18 +585,16 @@ export default function Dashboard() {
       </AlertDialog>
 
       <AlertDialog>
-        <AlertDialogTrigger ref={productListRef} className="hidden">
-        </AlertDialogTrigger>
-        <AlertDialogContent 
-          ref={alertContentRef} 
+        <AlertDialogTrigger ref={productListRef} className="hidden" />
+        <AlertDialogContent
+          ref={alertContentRef}
           className="w-[600px] max-w-[90vw] max-h-[70vh] overflow-hidden"
         >
           <AlertDialogHeader>
             <AlertDialogTitle>Product List</AlertDialogTitle>
-            <AlertDialogDescription className=" max-h-[50vh]">
+            <AlertDialogDescription className="max-h-[50vh]">
               <div className="max-h-[55vh] overflow-y-auto w-full">
-                <Table ref={productTableRef} className="border border-solid border-black">
-                  {/* <TableCaption>A list of all products</TableCaption> */}
+                <Table ref={productTableRef} className="border border-solid border-black p-[3vw]">
                   <TableHeader>
                     <TableRow className="bg-slate-200 border-black">
                       <TableHead className="text-left text-lg">Product ID</TableHead>
@@ -637,9 +635,9 @@ export default function Dashboard() {
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
-            <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogFooter className="h-[4vh]">
+            {/* <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction> */}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -712,24 +710,24 @@ export default function Dashboard() {
       </AlertDialogContent>
     </AlertDialog>
 
-<AlertDialog>
-  <AlertDialogTrigger ref={updateQtyRef} className="hidden">Open</AlertDialogTrigger>
-  <AlertDialogContent className="w-[18vw]">
-    <AlertDialogHeader>
-      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-      <AlertDialogDescription>
-        <div>
-          <Label htmlFor="username text-lg mb-1">Enter new Quantity</Label>
-          <Input className="outline" onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}} id="username" type="number" required />
-        </div>
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel>Cancel</AlertDialogCancel>
-      <AlertDialogAction onClick={() => {updateItemQty(selectedIndex, newQuantity)}}>Continue</AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
+      <AlertDialog>
+        <AlertDialogTrigger ref={updateQtyRef} className="hidden">Open</AlertDialogTrigger>
+        <AlertDialogContent className="w-[18vw]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div>
+                <Label htmlFor="username text-lg mb-1">Enter new Quantity</Label>
+                <Input className="outline" onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}} id="username" type="number" required />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {updateItemQty(selectedIndex, newQuantity)}}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
 
     </>
