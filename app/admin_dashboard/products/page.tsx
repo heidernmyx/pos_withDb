@@ -168,10 +168,12 @@ export default function ProductList() {
       productName: productName,
       productPrice: productPrice,
     }
+    console.log(productDetails);
     const formData = new FormData();
     formData.append('operation', 'insert');
     formData.append('json', JSON.stringify(productDetails));
-
+    
+    console.log(formData);
     const response = await axios({
       url: url,
       method: 'POST',
@@ -375,11 +377,10 @@ export default function ProductList() {
         <AlertDialogContent className="w-[27vw] px-[4vw] py-[5vh]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center">Add New Item</AlertDialogTitle>
-            <br />
             <AlertDialogDescription className="flex flex-col">
               <Label className="pr-[1vw] mb-[1vh]">Product Name:</Label>
               <Input
-                onChange={(e) => setNewName('')}
+                onChange={(e) => setProductName('')}
                 ref={productInputRef}
                 type="text"
                 placeholder=""
@@ -402,7 +403,6 @@ export default function ProductList() {
           <AlertDialogFooter></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       <AlertDialog>
         <AlertDialogTrigger ref={editItemRef} className="hidden">
           Open
@@ -416,6 +416,7 @@ export default function ProductList() {
                 <Label className="text-lg font-semibold">Product ID: </Label>
                 <span className="font-semibold">{selectedProductID}</span>
               </div>
+              <br/>
               <Label className="pr-[1vw] mb-[1vh]">Product Name:</Label>
               <Input
                 onChange={(e) => setNewName(e.target.value)}
@@ -425,7 +426,7 @@ export default function ProductList() {
                 placeholder=""
                 className="pl-4 w-full text-black mb-[1vh]"
               />
-              <br />
+              {/* <br /> */}
               <Label className="pr-[1vw] mb-[1vh]">Product Price:</Label>
               <Input
                 onChange={(e) => {
@@ -452,7 +453,6 @@ export default function ProductList() {
           <AlertDialogFooter></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
     </>
   )
 }

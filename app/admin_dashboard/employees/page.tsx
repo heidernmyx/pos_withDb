@@ -69,17 +69,46 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRef, useState, useEffect } from "react"
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
+import axios from 'axios';
+import { AddEmployeeDetails } from '@/lib/utils'
+
+
+
 
 const EmployeeList = () => {
 
   const [ employeeUsername, setEmployeeUsername ] = useState('');
   const [ employeePassword, setEmployeePassword ] = useState('');
   const [ employeeFullname, seEmployeeFullname ] = useState('');
-  const [ employeeType, setEmployeeType ] = useState('');
+  const [ employeeType, setEmployeeType ] = useState(0);
 
-  const addCashierRef = useRef<HTMLButtonElement>(null);
+  const addEMployeeRef = useRef<HTMLButtonElement>(null);
 
+  const addEmployee = async() => {
+    const url = `${process.env.NEXT_PUBLIC_URL}/php/add_employee.php`;
+
+
+    const employeeDetails: AddEmployeeDetails = {
+      user_role: employeeType,
+      username: employeeUsername,
+      password: employeePassword,
+      fullname: employeeFullname,
+    }
+
+    const formData = new FormData();
+    formData.append('operation', 'addEmployee');
+    formData.append('json', JSON.stringify(employeeDetails));
+
+    const response = await axios({
+      url: url,
+      method: "POST",
+      data: formData
+    })
+
+    console.log(response.data);
+    
+  }
 
 
   return (
@@ -126,9 +155,9 @@ const EmployeeList = () => {
               <Button size="sm" className="h-8 gap-1">
                 <PlusCircle className="h-3.5 w-3.5" />
                 <span
-                  // onClick={() => addItemRef.current?.click()} 
+                  onClick={() => addEMployeeRef.current?.click()} 
                   className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Add Product
+                  Add Employee
                 </span>
               </Button>
             </div>
@@ -150,9 +179,9 @@ const EmployeeList = () => {
                         Employee ID:
                       </TableHead>
                       <TableHead>Employee Name</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Employee Type</TableHead>
                       <TableHead className="hidden md:table-cell">
-                        Price
+                        
                       </TableHead>
                       <TableHead className="hidden md:table-cell">
                         Total Sales
@@ -180,7 +209,7 @@ const EmployeeList = () => {
                         Laser Lemonade Machine
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">Draft</Badge>
+                        <Badge variant="outline" className="text-base px-[1vw] py-[1vh]">Draft</Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         $499.99
@@ -225,7 +254,7 @@ const EmployeeList = () => {
         </Tabs>
       </main>
       <AlertDialog>
-        <AlertDialogTrigger ref={addCashierRef} className="hidden">
+        <AlertDialogTrigger ref={addEMployeeRef} className="hidden">
           Open
         </AlertDialogTrigger>
         <AlertDialogContent className="w-[27vw] px-[4vw] py-[5vh]">
@@ -246,7 +275,7 @@ const EmployeeList = () => {
                 placeholder=""
                 className="pl-4 w-full text-black mb-[1vh]"
               />
-              <br />
+              {/* <br /> */}
               <Label className="pr-[1vw] mb-[1vh]">Employee Password:</Label>
               <Input
                 onChange={(e) => setEmployeePassword(e.target.value)}
@@ -257,18 +286,18 @@ const EmployeeList = () => {
               <Label className="pr-[1vw] mb-[1vh]">Employee Fullname:</Label>
               <Input
                 onChange={(e) => seEmployeeFullname(e.target.value)}
-                type="password"
+                type="text"
                 placeholder=""
                 className="pl-4 w-full text-black mb-[1vh]"
               />
               <Label className="pr-[1vw] mb-[1vh]">Employee Type:</Label>
-              <select onChange={(e) => setEmployeeType(e.target.value)} className="flex h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
-                <option value="Cashier">Cashier</option>
-                <option value="Supervisor">Supervisor</option>
+              <select onChange={(e) => setEmployeeType(parseInt(e.target.value))} className="flex text-black h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
+                <option value="1">Cashier</option>
+                <option value="2">Supervisor</option>
               </select>
               <div className="flex mt-[5vh] justify-between">
-                {/* <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => editProduct(selectedProductID, newName, newPrice)} className="w-[45%]">Update Product</AlertDialogAction> */}
+                <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => addEmployee()} className="w-[45%]">Update Product</AlertDialogAction>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>

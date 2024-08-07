@@ -32,3 +32,11 @@ export interface SortConfig {
   direction: 'ascending' | 'descending';
 }
 
+
+
+export interface AddEmployeeDetails {
+  user_role: number,
+  username: string,
+  password: string,
+  fullname: string
+}

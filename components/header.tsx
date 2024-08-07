@@ -68,7 +68,7 @@ export default function Header() {
           <Link href="/admin_dashboard/products" className={getLinkClass('/admin_dashboard/products')}>
             Products
           </Link>
-          <Link href="/admin_dashboard/employees" className={getLinkClass('/admin_dashboard/cashiers')}>
+          <Link href="/admin_dashboard/employees" className={getLinkClass('/admin_dashboard/employees')}>
             Employee
           </Link>
           <Link href="/admin_dashboard/analytics" className={getLinkClass('/admin_dashboard/analytics')}>
