@@ -48,10 +48,9 @@ import { useState } from 'react';
 
 export default function Header() {
 
-  const [ session, setSession ] = useState<string | null>(null);
+  const router = useRouter();
 
-  // const data = sessionStorage.getItem('fullname');
-  // setSession(data);
+  const session = sessionStorage.getItem('fullname')?.toString();
   const pathname = usePathname()
   const getLinkClass = (path: string) => {
     return pathname === path
@@ -135,7 +134,7 @@ export default function Header() {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {sessionStorage.clear(); router.push('/')}}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

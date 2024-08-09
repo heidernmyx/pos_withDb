@@ -46,19 +46,54 @@ class Employee {
   public function getEmployee() {
 
     include '../php/connection.php';
-    $sql = "SELECT * FROM tbl_accounts";
+    $sql = "SELECT
+        `user_id`,
+        tbl_roles.role AS user_role,
+        `fullname`,
+        `date_added`
+    FROM
+        `tbl_accounts`
+    INNER JOIN tbl_roles
+    ON tbl_roles.role_id = tbl_accounts.user_role
+    WHERE tbl_roles.role != 'admin'
+    ;";
+
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $returnValue = $stmt->fetchAll(PDO::FETCH_ASSOC);
     unset($conn); 
     unset($stmt);
-    return json_encode($result);
-
+    echo json_encode($returnValue);
 
   }
 
 
   public function addSupervisor() {
+
+    // $
+
+  }
+  
+  public function updateCashier() {
+
+    include '../php/connection.php';
+    $sql = "UPDATE
+        `tbl_accounts`
+    SET
+        `user_role` = ':',
+        `username` = ':',
+        `password` = ':',
+        `fullname` = ':'
+    WHERE
+        user_id = :";
+        $stmt = $conn->prepare($sql);
+        $stmt
+
+
+
+  }
+
+  public function deleteCashier() {
 
     // $
 
@@ -82,5 +117,8 @@ switch ($operation) {
   case "getEmployee":
     $employee->getEmployee();
     break;
+    // case "updateEmployee":
+    //   $employee->getEmployee();
+    //   break;
 
 }

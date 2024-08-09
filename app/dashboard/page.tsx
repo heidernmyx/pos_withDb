@@ -89,6 +89,7 @@ export default function Dashboard() {
   const pricesortRef = useRef<HTMLTableCellElement>(null);
   const quantitysortRef = useRef<HTMLTableCellElement>(null);
   const amountsortRef = useRef<HTMLTableCellElement>(null);
+  const voidTransactionRef = useRef<HTMLButtonElement>(null);
 
   const formattedDateTime = new Date().toLocaleString();
   
@@ -103,7 +104,7 @@ export default function Dashboard() {
         const response = await axios.get<ProductList[]>(`${process.env.NEXT_PUBLIC_URL}/php/product.php`, {
           params: {operation: 'getProducts'}
         });
-        console.log(response)
+        console.log(response.data)
         const List: ProductList[] = response.data.map(product => ({
           product_id: product.product_id,
           product_name: product.product_name,
@@ -257,6 +258,9 @@ export default function Dashboard() {
       }
       else if (event.key === "$") {
         amountsortRef.current?.click();
+      }
+      else if (event.key === "v") {
+        voidTransactionRef.current?.click();
       }
     };
     if ( mop != "Cash" ) {
@@ -728,6 +732,26 @@ export default function Dashboard() {
       <AlertDialogDescription>
         <div>
           <Label htmlFor="username text-lg mb-1">Enter new Quantity</Label>
+          <Input className="outline" onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}} id="username" type="number" required />
+        </div>
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={() => {updateItemQty(selectedIndex, newQuantity)}}>Continue</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
+
+<AlertDialog>
+  <AlertDialogTrigger ref={voidTransactionRef} className="hidden">Open</AlertDialogTrigger>
+  <AlertDialogContent className="w-[18vw]">
+    <AlertDialogHeader>
+      <AlertDialogTitle>Void Transaction?</AlertDialogTitle>
+      <AlertDialogDescription>
+        <div>
+          <Label htmlFor="username text-lg mb-1">Enter supervisor key</Label>
           <Input className="outline" onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}} id="username" type="number" required />
         </div>
       </AlertDialogDescription>

@@ -1,4 +1,4 @@
-"use"
+"use client"
 import Link from "next/link"
 import {
   Activity,
@@ -29,9 +29,26 @@ import {
 } from "@/components/ui/card"
 import Transactions from "@/components/transaction"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 
 export default function AdminDashboard() {
+
+  const session = sessionStorage.getItem('user_role');
+
+  const router = useRouter();
+  useEffect(()=> {
+    if (!session) {
+      router.push('/')
+    }
+    if (session == null || session != '3') { // Adjust the key to your specific session key
+      // clearSessionAndRedirect();
+      if (session == '1') {
+        router.push('/dashboard')
+      }
+    }
+    console.log(session)
+  })
 
   // const fullname = sessionStorage.getItem('fullname');
   // const fullname = sessionStorage.fullname

@@ -80,6 +80,7 @@ import { useRef, useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import axios from "axios"
 import type { ProductList } from "@/lib/utils"
+import { useRouter } from "next/navigation";
 
 interface ProductDetails {
   productName: string
@@ -108,15 +109,34 @@ export default function ProductList() {
   const productInputRef = useRef<HTMLInputElement>(null);
   const editItemRef = useRef<HTMLButtonElement>(null);
 
+
+  const session = sessionStorage.getItem('user_role');
+
+  const router = useRouter();
+  useEffect(()=> {
+    if (!session) {
+      router.push('/')
+    }
+    if (session == null || session != '3') { // Adjust the key to your specific session key
+      // clearSessionAndRedirect();
+      if (session == '1') {
+        router.push('/dashboard')
+      }
+    }
+    console.log(session, true)
+  })
+
   useEffect(() => {
     
     const getProducts = async () => {
 
       try {
+        console.log(true)
         const response = await axios.get<ProductList[]>(`${process.env.NEXT_PUBLIC_URL}/php/product.php`, {
           params: {operation: 'getProducts'}
         });
         console.log(response)
+        console.log(response.data[0])
         const List: ProductList[] = response.data.map(product => ({
           product_id: product.product_id,
           product_name: product.product_name,
@@ -131,6 +151,7 @@ export default function ProductList() {
       }
     }
     getProducts();
+    
 
   }, []);
 

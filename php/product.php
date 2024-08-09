@@ -39,7 +39,7 @@ class Product {
       include '../php/connection.php';
 
       // Use single or double quotes for the SQL query string
-      $sql = 'SELECT * FROM tbl_products';
+      $sql = 'SELECT * FROM `tbl_products`';
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

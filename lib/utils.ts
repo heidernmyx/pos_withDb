@@ -46,9 +46,11 @@ export interface AddEmployeeDetails {
   fullname: string
 }
 
-export interface EmployeeDetails{
-  employee_id: number,
-  fullname: string,
-  user_role: string,
-  date_added: string
+export interface EditEmployeeDetails {
+  user_role: number,
+  username: string,
+  password: string,
+  fullname: string
 }
+
+

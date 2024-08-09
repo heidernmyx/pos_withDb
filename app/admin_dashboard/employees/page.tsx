@@ -72,19 +72,43 @@ import { useRef, useState, useEffect } from "react"
 import { Label } from "@/components/ui/label";
 import axios from 'axios';
 import { AddEmployeeDetails, EmployeeDetails } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 export default function EmployeeList() {
 
   // console.log(true)
+
+  const session = sessionStorage.getItem('user_role');
+  const [ employeeList, setEmployeeList ] = useState<EmployeeDetails[]>([]);
+
+  const router = useRouter();
+  useEffect(()=> {
+    if (!session) {
+      router.push('/')
+    }
+    if (session == null || session != '3') { // Adjust the key to your specific session key
+      // clearSessionAndRedirect();
+      if (session == '1') {
+        router.push('/dashboard')
+      }
+    }
+  })
   useEffect(() => {
     const getEmployee = async () => {
       const response = await axios.get<EmployeeDetails>(`${process.env.NEXT_PUBLIC_URL}/php/employee.php`, {
         params: {operation: "getEmployee"}
       })
-      
-      console.log(response);
+
+      console.log(response.data)
+      const List:  EmployeeDetails[]= Array.isArray(response.data) ? response.data.map((employee: EmployeeDetails) => ({
+        user_id: employee.user_id,
+        user_role: employee.user_role,
+        fullname: employee.fullname,
+        date_added: employee.date_added
+      })) : []  ;
+
+      setEmployeeList(List)
     }
-    // getEmployee
     getEmployee();
   }, [])
 
@@ -92,7 +116,10 @@ export default function EmployeeList() {
   const [ employeePassword, setEmployeePassword ] = useState('');
   const [ employeeFullname, seEmployeeFullname ] = useState('');
   const [ employeeType, setEmployeeType ] = useState(1);
+  const [ newEmployeeType, setNewEmployeeType ] = useState(1);
 
+
+  const employeeEditRef = useRef<HTMLButtonElement>(null);
   const addEMployeeRef = useRef<HTMLButtonElement>(null);
 
   const addEmployee = async () => {
@@ -187,14 +214,12 @@ export default function EmployeeList() {
                       </TableHead>
                       <TableHead>Employee Name</TableHead>
                       <TableHead>Employee Type</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Total Sales
-                      </TableHead>
+                      
                       <TableHead className="hidden md:table-cell">
                         Created at
+                      </TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Actions
                       </TableHead>
                       <TableHead>
                         <span className="sr-only">Actions</span>
@@ -202,30 +227,19 @@ export default function EmployeeList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
+                    {employeeList.map((employee, index) => (
+                      <TableRow key={index}>
                       <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/placeholder.svg"
-                          width="64"
-                        />
+                        {employee.user_id}
                       </TableCell>
                       <TableCell className="font-medium">
-                        Laser Lemonade Machine
+                        {employee.fullname}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-base px-[1vw] py-[1vh]">Draft</Badge>
+                        <Badge variant="outline" className="text-base px-[1vw] py-[1vh]">{employee.user_role}</Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        $499.99
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        25
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-07-12 10:42 AM
+                        {employee.date_added}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -241,12 +255,15 @@ export default function EmployeeList() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => employeeEditRef.current?.click()}
+
+                              >Edit</DropdownMenuItem>
                             <DropdownMenuItem>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -301,7 +318,7 @@ export default function EmployeeList() {
               <select onChange={(e) => setEmployeeType(parseInt(e.target.value))} defaultValue={1} className="flex text-black h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
                 <option value="1">Cashier</option>
                 <option value="2">Supervisor</option>
-              </select><>{employeeType}</>
+              </select>
               <div className="flex mt-[5vh] justify-between">
                 <AlertDialogCancel className="w-[45%] border-black">Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={() => addEmployee()} className="w-[45%]">Add Employee</AlertDialogAction>
@@ -311,6 +328,42 @@ export default function EmployeeList() {
           <AlertDialogFooter></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <AlertDialog>
+
+  <AlertDialogTrigger ref={employeeEditRef} className="hidden">Open</AlertDialogTrigger>
+  <AlertDialogContent className="w-[25vw] px-[2vw] py-[1vw]">
+    <AlertDialogHeader>
+      <AlertDialogTitle>Edit Employee Details</AlertDialogTitle>
+      <AlertDialogDescription>
+        <div>
+          <Label htmlFor="username text-lg mb-1">Username</Label>
+          <Input className='mb-[1vh]'
+          // onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}}
+          id="username" type="number" title='username' required />
+          <Label htmlFor="username text-lg mb-1">Password</Label>
+          <Input className='mb-[1vh]'
+          // onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}}
+          id="username" type="number" title='password' required />
+          <Label htmlFor="username text-lg mb-1">Fullname</Label>
+          <Input className="mb-[1vh]" 
+          // onChange={(e) => {SetNewQuantity(parseInt(e.target.value))}}
+          id="username" type="number" title='fullname' required />
+          <Label htmlFor="username text-lg mb-[1vh]">User role</Label>
+          <select onChange={(e) => setNewEmployeeType(parseInt(e.target.value))} defaultValue={1} className="flex text-black h-10 w-full rounded-md border border-black bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" title="status">
+            <option value="1">Cashier</option>
+            <option value="2">Supervisor</option>
+          </select><>{newEmployeeType}</>
+        </div>
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction 
+      // onClick={() => {updateItemQty(selectedIndex, newQuantity)}}
+      >Continue</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
     </>
   )
 }

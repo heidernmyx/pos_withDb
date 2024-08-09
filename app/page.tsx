@@ -44,37 +44,39 @@ export default function Home() {
     
     const formData = new FormData();
     formData.append('json', JSON.stringify(data))
-    try {
       const response = await axios({
         url: url,
         method: "POST",
         data: formData
       });
-
-      console.log(response.data.user_role );
+      const { data: userData } = response;
+      console.log(userData)
+      // console.log(userData.error?.message );
       const { user_id, user_role, fullname } = response.data;
       
       
-      if (user_role == 1) {
-        sessionStorage.setItem('user_id', user_id);
-        sessionStorage.setItem('user_role', user_role);
-        sessionStorage.setItem('fullname', fullname);
-        
-        router.push('/dashboard')
-
-      } 
-      else if (user_role == 2){
-        
-      }
+    if (userData.user_role == 1) {
+      console.log(true)
+      sessionStorage.setItem('user_id', user_id);
+      sessionStorage.setItem('user_role', user_role);
+      sessionStorage.setItem('fullname', fullname);
       
-      else if (user_role == 3){
-        sessionStorage.setItem('user_id', user_id);
-        sessionStorage.setItem('user_role', user_role);
-        sessionStorage.setItem('fullname', fullname);
-        
-        router.push('/admin_dashboard')
-      }
-    } catch (error) {
+      router.push('/dashboard')
+
+    } 
+    // else if (user_role == 2){
+      
+    // }
+    
+    else if (userData.user_role == 3){
+      sessionStorage.setItem('user_id', user_id);
+      sessionStorage.setItem('user_role', user_role);
+      sessionStorage.setItem('fullname', fullname);
+      
+      router.push('/admin_dashboard')
+    }
+    else if (userData.error.message) {
+      alert(userData.error.message);
     }
   };
 
